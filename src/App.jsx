@@ -10,6 +10,7 @@ import { SettingsPage } from './pages/SettingsPage'
 import { AboutPage } from './pages/AboutPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { DevComponentsPage } from './pages/DevComponentsPage'
+import { DevRunnerPage } from './pages/DevRunnerPage'
 
 /**
  * Main application component with HashRouter.
@@ -32,7 +33,10 @@ export function App() {
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/about" element={<AboutPage />} />
           {isDev && (
-            <Route path="/dev/components" element={<DevComponentsPage />} />
+            <>
+              <Route path="/dev/components" element={<DevComponentsPage />} />
+              <Route path="/dev/runner" element={<DevRunnerPage />} />
+            </>
           )}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

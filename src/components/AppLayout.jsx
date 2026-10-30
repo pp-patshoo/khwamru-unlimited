@@ -34,9 +34,14 @@ export function AppLayout({ children }) {
               {th.nav.settings}
             </NavLink>
             {isDev && (
-              <NavLink to="/dev/components" className={getNavLinkClass}>
-                {th.nav.devComponents}
-              </NavLink>
+              <>
+                <NavLink to="/dev/components" className={getNavLinkClass}>
+                  {th.nav.devComponents}
+                </NavLink>
+                <NavLink to="/dev/runner" className={getNavLinkClass}>
+                  {th.nav.devRunner}
+                </NavLink>
+              </>
             )}
           </nav>
         </header>

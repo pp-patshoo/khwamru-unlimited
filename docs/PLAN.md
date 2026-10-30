@@ -33,12 +33,13 @@
 
 ## Phase 1 ระบบรันโค้ด
 
-### [ ] T1.1 Pyodide Worker
+### [x] T1.1 Pyodide Worker
 - กำหนด `PYODIDE_VERSION` และ URL ไว้ใน `src/config.js` โดยใช้เวอร์ชัน stable ล่าสุด แล้วบันทึกเหตุผลใน DECISIONS.md
 - เขียน worker ตาม protocol ใน SPEC หัวข้อ 6 ให้รองรับ stdout/stderr, stdin, namespace ใหม่ทุกครั้งที่รัน, การแสดงค่าบรรทัดสุดท้าย และ error ที่ระบุเลขบรรทัดถูกต้อง
 - สร้าง `runnerClient.js` ที่เรียกใช้แบบ Promise และติดตามสถานะได้ (loading/ready/running/error) และให้เริ่มโหลดเบื้องหลังหลังหน้าแรกแสดงผล
 - เขียน unit test สำหรับฟังก์ชันที่แยก traceback และสร้างหน้า `/dev/runner` สำหรับทดสอบ
 **เกณฑ์ผ่าน:** `print("สวัสดี")` แสดงผลภาษาไทยถูกต้อง, `input()` อ่านค่าจาก stdin ได้, error แสดงเลขบรรทัดของโค้ดผู้เรียนถูกต้อง และ `1 + 1` ในบรรทัดสุดท้ายแสดง `2`
+- หมายเหตุ: ใช้ Pyodide เวอร์ชัน 314.0.7 (แท็ก latest บน npm/CDN ที่รองรับ Python 3.14) และบันทึกการตัดสินใจใน docs/DECISIONS.md เรียบร้อยแล้ว
 
 ### [ ] T1.2 Editor, Output และปุ่มหยุด
 - สร้าง CodeEditor (python/sql) ที่มีเลขบรรทัด ย่อหน้าครั้งละ 4 ช่องว่าง กด Tab แล้วได้ 4 ช่องว่าง และกด Ctrl+Enter เพื่อรัน

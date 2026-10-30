@@ -10,6 +10,7 @@ export const th = {
     settings: 'ตั้งค่า',
     about: 'เกี่ยวกับ',
     devComponents: 'ส่วนประกอบ (Dev)',
+    devRunner: 'ทดสอบ Runner (Dev)',
   },
 
   // Page titles and placeholders (T0.3)
@@ -108,5 +109,49 @@ export const th = {
     fail: 'ไม่ผ่าน',
     screenGuardSection: '9. ระบบจำกัดขนาดหน้าจอ (ScreenSizeGuard)',
     screenGuardNote: 'ทดสอบได้โดยการย่อความกว้างหน้าต่างเบราว์เซอร์ให้น้อยกว่า 1024px',
+  },
+
+  // Runner & Pyodide status (SPEC หัวข้อ 6)
+  runner: {
+    status: {
+      uninitialized: 'ยังไม่ได้เริ่ม',
+      loading: 'กำลังโหลด Pyodide...',
+      ready: 'พร้อมใช้งาน',
+      running: 'กำลังรันโค้ด...',
+      error: 'เกิดข้อผิดพลาดในการโหลด',
+    },
+    defaultLoadingMessage: 'กำลังเตรียมระบบ Pyodide...',
+    readyMessage: 'พร้อมใช้งาน',
+    runningMessage: 'กำลังรันโค้ด...',
+  },
+
+  // Dev Runner Page (T1.1)
+  devRunner: {
+    title: 'ทดสอบ Pyodide Runner (T1.1)',
+    description: 'หน้านี้ใช้สำหรับทดสอบการทำงานของ Pyodide Web Worker ตามเกณฑ์ผ่านของ T1.1',
+    statusLabel: 'สถานะ Runner:',
+    codeLabel: 'โค้ด Python ที่จะรัน:',
+    stdinLabel: 'ข้อมูลสำหรับ input() (แต่ละบรรทัดแยกตามรอบที่เรียก):',
+    runButton: 'รันโค้ด',
+    runningButton: 'กำลังรัน...',
+    presetsLabel: 'ตัวอย่างโค้ดทดสอบตามเกณฑ์ผ่าน:',
+    presetHello: '1. ทดสอบ print ภาษาไทย',
+    presetStdin: '2. ทดสอบ input()',
+    presetError: '3. ทดสอบ Error และระบุเลขบรรทัด',
+    presetLastExpr: '4. ทดสอบ 1 + 1 บรรทัดสุดท้าย',
+    presetNamespace: '5. ทดสอบแยก Namespace',
+    stdoutLabel: 'Standard Output (stdout):',
+    stderrLabel: 'Standard Error (stderr):',
+    resultLabel: 'ผลลัพธ์บรรทัดสุดท้าย (Result):',
+    errorLabel: 'ข้อผิดพลาด (Error):',
+    errorType: 'ประเภท:',
+    errorLine: 'เลขบรรทัด:',
+    errorMessage: 'ข้อความ:',
+    tracebackLabel: 'Traceback:',
+    noOutput: '(ไม่มีข้อความส่งออก)',
+    successDone: 'รันสำเร็จ (ok: true)',
+    failedDone: 'รันไม่สำเร็จ (ok: false)',
+    emptyResult: '(ไม่มีผลลัพธ์)',
+    emptyError: '(ไม่มีข้อผิดพลาด)',
   },
 }
