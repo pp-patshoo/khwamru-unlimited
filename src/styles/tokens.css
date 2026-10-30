@@ -1,4 +1,86 @@
 :root {
-  /* Design tokens will be defined in T0.2 */
-}
+  /* Colors (SPEC หัวข้อ 5) */
+  --color-bg: #F3FAF5;
+  --color-surface: #FFFFFF;
+  --color-primary: #A8DDB5;
+  --color-primary-hover: #7CC796;
+  --color-text: #1F3D2B;
+  --color-text-muted: #4A6656;
+  --color-success: #4CAF7A;
+  --color-error: #E57373;
+  --color-border: #D6EBDC;
 
+  /* Callout Semantic Colors */
+  --color-callout-tip-bg: #EAF7ED;
+  --color-callout-tip-border: #A3D9B1;
+  --color-callout-tip-accent: #2E7D32;
+
+  --color-callout-warning-bg: #FFFBEB;
+  --color-callout-warning-border: #FCD34D;
+  --color-callout-warning-accent: #B45309;
+
+  --color-callout-note-bg: #EFF6FF;
+  --color-callout-note-border: #BFDBFE;
+  --color-callout-note-accent: #1D4ED8;
+
+  --color-callout-mac-bg: #F8FAFC;
+  --color-callout-mac-border: #CBD5E1;
+  --color-callout-mac-accent: #334155;
+
+  --color-callout-excel-bg: #F0FDF4;
+  --color-callout-excel-border: #86EFAC;
+  --color-callout-excel-accent: #15803D;
+
+  /* Badge Semantic Colors */
+  --color-badge-default-bg: #E2E8F0;
+  --color-badge-default-text: #1F3D2B;
+  --color-badge-success-bg: #DCFCE7;
+  --color-badge-success-text: #1F3D2B;
+  --color-badge-warning-bg: #FEF3C7;
+  --color-badge-warning-text: #1F3D2B;
+  --color-badge-error-bg: #FEE2E2;
+  --color-badge-error-text: #1F3D2B;
+  --color-badge-info-bg: #E0F2FE;
+  --color-badge-info-text: #1F3D2B;
+
+  /* Fonts (SPEC หัวข้อ 5) */
+  --font-sans: 'IBM Plex Sans Thai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-size-sm: 0.875rem; /* 14px */
+  --font-size-base: 1rem; /* 16px */
+  --font-size-lg: 1.125rem; /* 18px */
+  --font-size-xl: 1.25rem; /* 20px */
+  --font-size-2xl: 1.5rem; /* 24px */
+  --line-height-base: 1.7; /* 1.7 */
+  --line-height-tight: 1.3;
+
+  /* Spacing: 4px multiples (SPEC หัวข้อ 5) */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+
+  /* Radii (SPEC หัวข้อ 5: มุมโค้ง 12px) */
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* Shadows (SPEC หัวข้อ 5: เงาบางและนุ่ม) */
+  --shadow-sm: 0 1px 3px rgba(31, 61, 43, 0.06), 0 1px 2px rgba(31, 61, 43, 0.04);
+  --shadow-md: 0 4px 12px rgba(31, 61, 43, 0.08), 0 2px 4px rgba(31, 61, 43, 0.04);
+  --shadow-lg: 0 8px 24px rgba(31, 61, 43, 0.12), 0 4px 8px rgba(31, 61, 43, 0.06);
+
+  /* Focus & Accessibility */
+  --focus-ring: 2px solid var(--color-primary-hover);
+  --focus-outline-offset: 2px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+}

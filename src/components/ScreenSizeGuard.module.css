@@ -1,0 +1,46 @@
+.guardBanner {
+  display: none;
+}
+
+.content {
+  display: contents;
+}
+
+@media (max-width: 1023px) {
+  .content {
+    display: none !important;
+  }
+
+  .guardBanner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--spacing-8);
+    text-align: center;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  .iconWrapper {
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-4);
+  }
+
+  .title {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    margin: 0 0 var(--spacing-3) 0;
+    line-height: var(--line-height-tight);
+  }
+
+  .message {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-muted);
+    max-width: 480px;
+    margin: 0;
+    line-height: var(--line-height-base);
+  }
+}
+

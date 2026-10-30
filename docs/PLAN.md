@@ -17,13 +17,14 @@
 - สร้าง `.gitattributes` ที่มี `* text=auto eol=lf` และกำหนดให้ไฟล์ฟอนต์ ไอคอน และ PNG เป็น `binary`
 - หลัง `git init` ให้รัน `git remote add origin <URL ที่เจ้าของให้>` และเมื่อเจ้าของพิมพ์ "ผ่าน" ให้รัน `git push -u origin main`
 
-### [ ] T0.2 Design system และ Layout
+### [x] T0.2 Design system และ Layout
 - สร้าง `tokens.css` ตาม SPEC หัวข้อ 5, ติดตั้งฟอนต์ผ่าน fontsource และสร้าง `global.css`
 - สร้างคอมโพเนนต์ Button (primary/secondary/ghost), Card, Callout (tip/warning/note/mac/excel), Badge, ProgressBar, Modal, Toast และ Tooltip
 - สร้าง AppLayout ที่มี header (ชื่อแอป + เมนู คอร์ส/คำศัพท์/ตั้งค่า) และสร้าง ScreenSizeGuard สำหรับหน้าจอกว้างน้อยกว่า 1024px
 - สร้างหน้า `/dev/components` แสดงคอมโพเนนต์ทั้งหมด
 **เกณฑ์ผ่าน:** สีตัวอักษรทุกคู่มี contrast อย่างน้อย 4.5:1 (ให้แสดงตารางผลตรวจ) กด Tab แล้วเห็น focus ชัด และไม่มีการโหลดฟอนต์จาก CDN
 **เจ้าของตรวจ:** เปิด `/#/dev/components` ดูหน้าตา แล้วลองย่อหน้าต่างให้แคบลง
+- หมายเหตุ: เพิ่มเฉดสีพื้นหลังโทนอ่อนสำหรับ Callout และ Badge ลงใน tokens.css เพื่อให้ทุกคู่สีผ่านเกณฑ์ WCAG AA (contrast >= 4.5:1) โดยบันทึกการตัดสินใจใน DECISIONS.md
 
 ### [ ] T0.3 Routing และโครงหน้า
 - สร้าง route ทุกหน้าตาม SPEC หัวข้อ 4 โดยใช้ HashRouter ใส่เนื้อหาชั่วคราวไว้ก่อน และมีหน้า 404

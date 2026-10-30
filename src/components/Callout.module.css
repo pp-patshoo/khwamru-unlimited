@@ -1,0 +1,91 @@
+.callout {
+  display: flex;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4) var(--spacing-5);
+  border-radius: var(--radius);
+  border-left: 4px solid transparent;
+  border-top: 1px solid transparent;
+  border-right: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+  color: var(--color-text);
+  line-height: var(--line-height-base);
+  margin: var(--spacing-4) 0;
+}
+
+.iconWrapper {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  margin-top: 2px;
+}
+
+.body {
+  flex: 1;
+}
+
+.title {
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  margin: 0 0 var(--spacing-1) 0;
+  line-height: var(--line-height-tight);
+}
+
+.content {
+  margin: 0;
+}
+
+/* Tip */
+.tip {
+  background-color: var(--color-callout-tip-bg);
+  border-color: var(--color-callout-tip-border);
+  border-left-color: var(--color-callout-tip-accent);
+}
+.tip .iconWrapper,
+.tip .title {
+  color: var(--color-callout-tip-accent);
+}
+
+/* Warning */
+.warning {
+  background-color: var(--color-callout-warning-bg);
+  border-color: var(--color-callout-warning-border);
+  border-left-color: var(--color-callout-warning-accent);
+}
+.warning .iconWrapper,
+.warning .title {
+  color: var(--color-callout-warning-accent);
+}
+
+/* Note */
+.note {
+  background-color: var(--color-callout-note-bg);
+  border-color: var(--color-callout-note-border);
+  border-left-color: var(--color-callout-note-accent);
+}
+.note .iconWrapper,
+.note .title {
+  color: var(--color-callout-note-accent);
+}
+
+/* Mac */
+.mac {
+  background-color: var(--color-callout-mac-bg);
+  border-color: var(--color-callout-mac-border);
+  border-left-color: var(--color-callout-mac-accent);
+}
+.mac .iconWrapper,
+.mac .title {
+  color: var(--color-callout-mac-accent);
+}
+
+/* Excel */
+.excel {
+  background-color: var(--color-callout-excel-bg);
+  border-color: var(--color-callout-excel-border);
+  border-left-color: var(--color-callout-excel-accent);
+}
+.excel .iconWrapper,
+.excel .title {
+  color: var(--color-callout-excel-accent);
+}
+
