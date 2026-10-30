@@ -1,0 +1,47 @@
+exercises:
+  - id: ex1
+    type: assert
+    title: คำนวณยอดขาย
+    instructions: |
+      ลาเต้แก้วละ 65 บาท ลูกค้าซื้อ 3 แก้ว
+      ให้สร้างตัวแปร `total` เพื่อเก็บยอดขายรวม
+    starterCode: |
+      price = 65
+      quantity = 3
+      total = 0  # แก้บรรทัดนี้
+    tests: |
+      assert "total" in globals(), "ยังไม่พบตัวแปร total ลองสร้างตัวแปรชื่อ total"
+      assert total == 195, f"ตอนนี้ total มีค่า {total} ลองนำราคามาคูณกับจำนวนแก้ว"
+    solution: |
+      price = 65
+      quantity = 3
+      total = price * quantity
+    hints:
+      - ยอดขายรวมคำนวณจากราคาและจำนวน
+      - เครื่องหมายคูณใน Python คือ *
+      - "ลองเขียน total = price * quantity"
+
+  - id: ex2
+    type: output
+    title: แสดงยอดขาย
+    instructions: |
+      ให้แสดงข้อความ: ยอดขายรวม 195 บาท
+    starterCode: |
+      total = 195
+    expectedOutput: |
+      ยอดขายรวม 195 บาท
+    solution: |
+      total = 195
+      print(f"ยอดขายรวม {total} บาท")
+    hints:
+      - ใช้ print() เพื่อแสดงข้อความ
+      - f-string ช่วยนำค่าของตัวแปรไปใส่ในข้อความได้
+
+  - id: ex3
+    type: quiz
+    title: ทบทวน
+    questions:
+      - question: ข้อใดตั้งชื่อตัวแปรได้ถูกต้อง
+        choices: ["total price", "total_price", "1total"]
+        answer: 1
+        explanation: ชื่อตัวแปรห้ามมีช่องว่างและห้ามขึ้นต้นด้วยตัวเลข

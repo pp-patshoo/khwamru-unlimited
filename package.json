@@ -1,0 +1,55 @@
+{
+  "name": "khwamru-unlimited",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run content:build && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "content:build": "node -e \"console.log('ยังไม่ได้ทำ (ดู T3.1)')\"",
+    "content:check": "node -e \"console.log('ยังไม่ได้ทำ (ดู T3.5)')\"",
+    "data:generate": "node -e \"console.log('ยังไม่ได้ทำ (ดู T2.1)')\""
+  },
+  "dependencies": {
+    "@codemirror/lang-python": "^6.1.7",
+    "@codemirror/lang-sql": "^6.8.0",
+    "@fontsource/ibm-plex-sans-thai": "^5.2.5",
+    "@fontsource/jetbrains-mono": "^5.2.5",
+    "@uiw/react-codemirror": "^4.23.10",
+    "dexie": "^4.0.11",
+    "gray-matter": "^4.0.3",
+    "lucide-react": "^1.16.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^7.3.0",
+    "remark-directive": "^3.0.1",
+    "remark-gfm": "^4.0.1",
+    "yaml": "^2.7.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.22.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "jsdom": "^26.0.0",
+    "prettier": "^3.5.3",
+    "vite": "^6.2.1",
+    "vite-plugin-pwa": "^0.21.1",
+    "vitest": "^3.0.8"
+  }
+}
+
