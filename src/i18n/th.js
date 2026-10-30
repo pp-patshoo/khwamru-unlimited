@@ -8,7 +8,52 @@ export const th = {
     courses: 'คอร์สเรียน',
     glossary: 'คำศัพท์',
     settings: 'ตั้งค่า',
+    about: 'เกี่ยวกับ',
     devComponents: 'ส่วนประกอบ (Dev)',
+  },
+
+  // Page titles and placeholders (T0.3)
+  pages: {
+    home: {
+      startLearning: 'เริ่มเรียน',
+    },
+    courses: {
+      title: 'เลือกคอร์สเรียน',
+      placeholder: 'รายการคอร์สจะแสดงที่นี่',
+    },
+    courseDetail: {
+      title: 'ภาพรวมคอร์ส',
+      courseId: 'รหัสคอร์ส',
+      placeholder: 'รายละเอียดคอร์สจะแสดงที่นี่',
+    },
+    lesson: {
+      title: 'หน้าเรียน',
+      courseId: 'รหัสคอร์ส',
+      lessonId: 'รหัสบทเรียน',
+      placeholder: 'เนื้อหาบทเรียนจะแสดงที่นี่',
+    },
+    glossary: {
+      title: 'คำศัพท์',
+      placeholder: 'รายการคำศัพท์จะแสดงที่นี่',
+    },
+    placement: {
+      title: 'แบบทดสอบข้ามบท',
+      courseId: 'รหัสคอร์ส',
+      placeholder: 'แบบทดสอบจะแสดงที่นี่',
+    },
+    settings: {
+      title: 'ตั้งค่า',
+      placeholder: 'ตัวเลือกการตั้งค่าจะแสดงที่นี่',
+    },
+    about: {
+      title: 'เกี่ยวกับ',
+      placeholder: 'ข้อมูลเกี่ยวกับแอปจะแสดงที่นี่',
+    },
+    notFound: {
+      title: 'ไม่พบหน้านี้',
+      message: 'หน้าที่คุณต้องการไม่มีอยู่ในระบบ หรืออาจถูกย้ายไปที่อื่นแล้ว',
+      backHome: 'กลับหน้าแรก',
+    },
   },
 
   // ScreenSizeGuard (SPEC หัวข้อ 4)
