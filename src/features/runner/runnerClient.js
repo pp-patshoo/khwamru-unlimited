@@ -2,6 +2,7 @@
  * Client for interacting with the Pyodide Web Worker.
  */
 import { config } from '../../config.js'
+import { th } from '../../i18n/th'
 import { createOutputLimiter } from './outputLimiter.js'
 
 let worker = null
@@ -50,6 +51,17 @@ function finishRun(id, outcome) {
 }
 
 /**
+ * เริ่มนับเวลาหยุดอัตโนมัติ เมื่อ worker บอกว่าเริ่มรันโค้ดของผู้เรียนแล้ว
+ * จึงไม่นับเวลาที่ใช้โหลด package ก่อนหน้า (SPEC หัวข้อ 6)
+ * @param {string} id
+ */
+function startRunTimer(id) {
+  const run = activeRuns.get(id)
+  if (!run || run.timer) return
+  run.timer = setTimeout(() => restartRunner('timeout'), run.timeoutMs)
+}
+
+/**
  * Handle incoming messages from the Pyodide worker
  * @param {MessageEvent} event
  */
@@ -63,6 +75,9 @@ function handleWorkerMessage(event) {
         state: data.state,
         message: data.message || '',
       })
+      if (data.state === 'running' && data.id) {
+        startRunTimer(data.id)
+      }
       break
 
     case 'stdout': {
@@ -148,7 +163,7 @@ function getOrCreateWorker() {
     console.error('Pyodide Worker Error:', error)
     updateStatus({
       state: 'error',
-      message: error.message || 'Worker encounter an error',
+      message: th.runner.initFailed(error.message || 'เกิดข้อผิดพลาดในระบบรัน'),
     })
   }
 
@@ -168,7 +183,7 @@ export async function initRunner() {
     return initPromise
   }
 
-  initPromise = new Promise((resolve, reject) => {
+  const attempt = new Promise((resolve, reject) => {
     try {
       const w = getOrCreateWorker()
       updateStatus({
@@ -197,7 +212,28 @@ export async function initRunner() {
     }
   })
 
-  return initPromise
+  initPromise = attempt
+  // ถ้าโหลดไม่สำเร็จ ต้องไม่จำผลล้มเหลวไว้ ไม่งั้นการกดรันครั้งถัดไปจะได้ error เดิมตลอด
+  // ทิ้ง worker ที่พัง แล้วล้าง initPromise ให้การรันถัดไปเริ่มโหลดใหม่ได้เอง
+  // เช็กว่ายังเป็นรอบนี้อยู่ เพราะ restartRunner อาจเริ่มรอบใหม่ไปแล้ว
+  attempt.catch(() => {
+    if (initPromise === attempt) {
+      discardWorker()
+      initPromise = null
+    }
+  })
+
+  return attempt
+}
+
+/**
+ * ทิ้ง worker ปัจจุบันทั้งตัว ใช้ทั้งตอนหยุดโค้ดและตอนโหลด Pyodide ล้มเหลว
+ */
+function discardWorker() {
+  if (worker) {
+    worker.terminate()
+    worker = null
+  }
 }
 
 /**
@@ -207,10 +243,7 @@ export async function initRunner() {
  * @param {'timeout' | 'user'} reason - สาเหตุที่หยุด ส่งกลับให้หน้าจอแสดงข้อความ
  */
 function restartRunner(reason) {
-  if (worker) {
-    worker.terminate()
-    worker = null
-  }
+  discardWorker()
   initPromise = null
   // ตั้งสถานะเป็น uninitialized ก่อน เพื่อให้ initRunner ไม่คืนค่า ready เดิมทันที
   updateStatus({ state: 'uninitialized', message: '' })
@@ -227,11 +260,13 @@ function restartRunner(reason) {
 /**
  * Execute Python code in the Pyodide worker
  * ต้องรันทีละโค้ด เพราะ worker ทำงานได้ทีละงาน
- * timer นับหลัง worker พร้อมแล้ว จึงไม่รวมเวลาโหลด Pyodide
+ * timer เริ่มนับตอน worker แจ้งว่าเริ่มรันโค้ดจริง จึงไม่รวมเวลาโหลด Pyodide และ package
  * @param {object} options
  * @param {string} options.code - Python code to run
  * @param {string} [options.stdin] - Input data for input() calls
  * @param {string} [options.mode='python'] - Execution mode ('python' | 'sql')
+ * @param {string[]} [options.packages] - package เพิ่มเติมจาก frontmatter ของบท
+ * @param {string[]} [options.datasets] - ชื่อไฟล์ CSV ที่ต้องเขียนลง data/ ก่อนรัน
  * @param {number} [options.timeoutMs] - หยุดอัตโนมัติหลังกี่มิลลิวินาที (ค่าเริ่มต้นจาก config)
  * @param {(text: string) => void} [options.onStdout] - Stdout callback
  * @param {(text: string) => void} [options.onStderr] - Stderr callback
@@ -244,6 +279,8 @@ export async function runCode({
   code,
   stdin = '',
   mode = 'python',
+  packages = [],
+  datasets = [],
   timeoutMs = config.runTimeoutMs,
   onStdout,
   onStderr,
@@ -257,6 +294,7 @@ export async function runCode({
   const id = `run_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
 
   return new Promise((resolve) => {
+    // timer ยังไม่เริ่ม จะเริ่มเมื่อ worker แจ้งสถานะ running ของงานนี้ (ดู startRunTimer)
     const run = {
       resolve,
       onStdout,
@@ -266,9 +304,9 @@ export async function runCode({
       onTable,
       lastResult: null,
       limiter: createOutputLimiter(),
+      timeoutMs,
       timer: null,
     }
-    run.timer = setTimeout(() => restartRunner('timeout'), timeoutMs)
     activeRuns.set(id, run)
 
     w.postMessage({
@@ -277,6 +315,8 @@ export async function runCode({
       mode,
       code,
       stdin,
+      packages,
+      datasets,
     })
   })
 }

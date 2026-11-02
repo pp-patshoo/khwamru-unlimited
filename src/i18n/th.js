@@ -123,6 +123,20 @@ export const th = {
     defaultLoadingMessage: 'กำลังเตรียมระบบ Pyodide...',
     readyMessage: 'พร้อมใช้งาน',
     runningMessage: 'กำลังรันโค้ด...',
+    initFailed: (detail) =>
+      `โหลดระบบรัน Python ไม่สำเร็จ (${detail}) ตรวจว่าเชื่อมต่ออินเทอร์เน็ตอยู่ แล้วกดรันอีกครั้ง`,
+    // ข้อความระหว่างเตรียม package, ไฟล์ข้อมูล และฟอนต์ก่อนรันโค้ด (T1.3)
+    prepare: {
+      packageLoading: (names) => `กำลังเตรียม ${names}...`,
+      packageLoaded: (names) => `เตรียม ${names} เสร็จแล้ว`,
+      packageDefault: 'กำลังเตรียม package...',
+      packageFailed: (detail) =>
+        `เตรียม package ไม่สำเร็จ (${detail}) ตรวจชื่อ package แล้วกดรันอีกครั้ง`,
+      datasetMissing: (name) =>
+        `ไม่พบไฟล์ข้อมูล "${name}" กรุณาแจ้งผู้ดูแลบทเรียน หรือรีเฟรชหน้าแล้วลองใหม่`,
+      fontFailed: 'โหลดฟอนต์ภาษาไทยสำหรับกราฟไม่สำเร็จ กรุณารีเฟรชหน้าแล้วลองใหม่',
+      figureFailed: 'วาดกราฟไม่สำเร็จ ผลลัพธ์อื่นยังแสดงอยู่ด้านบน',
+    },
   },
 
   // Dev Runner Page (T1.1)
@@ -142,6 +156,9 @@ export const th = {
     presetNamespace: '5. ทดสอบแยก Namespace',
     presetInfinite: '6. ทดสอบวนลูปไม่หยุด (while True)',
     presetLongOutput: '7. ทดสอบ output ยาวเกินไป',
+    presetCsv: '8. อ่านไฟล์ CSV ด้วย pandas (T1.3)',
+    presetChart: '9. วาดกราฟชื่อภาษาไทย (T1.3)',
+    presetLongTable: '10. ตาราง DataFrame ยาวเกิน 50 แถว (T1.3)',
     stdoutLabel: 'Standard Output (stdout):',
     stderrLabel: 'Standard Error (stderr):',
     resultLabel: 'ผลลัพธ์บรรทัดสุดท้าย (Result):',

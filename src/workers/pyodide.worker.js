@@ -1,5 +1,8 @@
 import { config } from '../config.js'
+import { th } from '../i18n/th.js'
 import { parseTraceback } from '../features/runner/traceback.js'
+import { PYTHON_HELPERS } from './pythonHelpers.js'
+import { PrepareError, prepareEnvironment } from './environment.js'
 
 let pyodideInstance = null
 let pyodideLoadingPromise = null
@@ -92,6 +95,7 @@ async function initPyodide() {
 
       // Run bootstrap helpers
       instance.runPython(PYTHON_BOOTSTRAP)
+      instance.runPython(PYTHON_HELPERS)
 
       pyodideInstance = instance
 
@@ -107,7 +111,7 @@ async function initPyodide() {
       self.postMessage({
         type: 'status',
         state: 'error',
-        message: `ไม่สามารถโหลด Pyodide ได้: ${err.message || String(err)}`,
+        message: th.runner.initFailed(err.message || String(err)),
       })
       throw err
     }
@@ -117,74 +121,136 @@ async function initPyodide() {
 }
 
 /**
+ * รันโค้ดของผู้เรียนใน namespace ใหม่ และส่งค่าบรรทัดสุดท้ายกลับไป
+ * @param {any} py
+ * @param {string} id
+ * @param {string} code
+ * @param {string} stdin
+ */
+function runUserCode(py, id, code, stdin) {
+  const runHelper = py.globals.get('_run_user_code')
+  // Create a fresh namespace dictionary for every run
+  const userNs = py.runPython('dict()')
+  let pyResult = null
+
+  try {
+    pyResult = runHelper(code, stdin, userNs)
+    if (pyResult.get('has_result')) {
+      postExpressionValue(py, id, pyResult.get('result'))
+    }
+  } finally {
+    if (pyResult && typeof pyResult.destroy === 'function') {
+      pyResult.destroy()
+    }
+    if (userNs && typeof userNs.destroy === 'function') {
+      userNs.destroy()
+    }
+  }
+}
+
+/**
+ * ค่าบรรทัดสุดท้าย: DataFrame หรือ Series ส่งเป็นตาราง ค่าอื่นส่งเป็นข้อความ
+ * @param {any} py
+ * @param {string} id
+ * @param {any} value
+ */
+function postExpressionValue(py, id, value) {
+  if (py.globals.get('_is_table')(value)) {
+    const table = JSON.parse(py.globals.get('_table_json')(value, config.tableMaxRows))
+    self.postMessage({ type: 'table', id, ...table })
+    return
+  }
+
+  const reprFn = py.runPython('repr')
+  self.postMessage({
+    type: 'result',
+    id,
+    repr: String(reprFn(value)),
+  })
+}
+
+/**
+ * ส่งกราฟทุกอันที่เปิดค้างไว้เป็น PNG
+ * ต้องส่งก่อนข้อความ done เพราะหลัง done ฝั่งหน้าเว็บจะไม่รับข้อความของการรันนี้แล้ว
+ * @param {any} py
+ * @param {string} id
+ */
+function postFigures(py, id) {
+  try {
+    const images = JSON.parse(py.globals.get('_collect_figures')())
+    for (const dataUrl of images) {
+      self.postMessage({ type: 'image', id, dataUrl })
+    }
+  } catch {
+    self.postMessage({ type: 'stderr', id, text: th.runner.prepare.figureFailed })
+  }
+}
+
+/**
+ * แปลง error เป็นรูปแบบที่หน้าจอแสดงได้
+ * @param {unknown} err
+ * @returns {object}
+ */
+function toErrorObject(err) {
+  if (err instanceof PrepareError) {
+    return { type: 'PrepareError', message: err.message, line: null, traceback: '' }
+  }
+  const rawTraceback = err.message || String(err)
+  return parseTraceback(rawTraceback, '<user-code>')
+}
+
+/**
  * Run user Python code in an isolated namespace
  * @param {object} payload
  * @param {string} payload.id
  * @param {string} payload.code
  * @param {string} [payload.stdin]
+ * @param {string[]} [payload.packages]
+ * @param {string[]} [payload.datasets]
  */
 async function handleRun(payload) {
-  const { id, code, stdin = '' } = payload
+  const { id, code, stdin = '', packages = [], datasets = [] } = payload
   currentRunId = id
 
-  try {
-    const py = await initPyodide()
+  let py = null
+  let outcome = { ok: true, error: null }
 
+  try {
+    py = await initPyodide()
+
+    await prepareEnvironment(py, {
+      code,
+      packages,
+      datasets,
+      onProgress: (message) => self.postMessage({ type: 'status', state: 'loading', message }),
+    })
+
+    // ส่ง id ไปด้วย เพื่อให้หน้าเว็บเริ่มนับเวลาหยุดอัตโนมัติเฉพาะตอนเริ่มรันโค้ดจริง
     self.postMessage({
       type: 'status',
-      state: 'running',
-      message: 'กำลังรันโค้ด...',
-    })
-
-    const runHelper = py.globals.get('_run_user_code')
-    // Create a fresh namespace dictionary for every run
-    const userNs = py.runPython('dict()')
-
-    let pyResult = null
-    try {
-      pyResult = runHelper(code, stdin, userNs)
-
-      const hasResult = pyResult.get('has_result')
-      if (hasResult) {
-        const val = pyResult.get('result')
-        const reprFn = py.runPython('repr')
-        const reprStr = reprFn(val)
-        self.postMessage({
-          type: 'result',
-          id,
-          repr: String(reprStr),
-        })
-      }
-
-      self.postMessage({
-        type: 'done',
-        id,
-        ok: true,
-      })
-    } finally {
-      if (pyResult && typeof pyResult.destroy === 'function') {
-        pyResult.destroy()
-      }
-      if (userNs && typeof userNs.destroy === 'function') {
-        userNs.destroy()
-      }
-    }
-  } catch (err) {
-    const rawTraceback = err.message || String(err)
-    const parsed = parseTraceback(rawTraceback, '<user-code>')
-
-    self.postMessage({
-      type: 'done',
       id,
-      ok: false,
-      error: parsed,
+      state: 'running',
+      message: th.runner.runningMessage,
     })
-  } finally {
-    currentRunId = null
+
+    runUserCode(py, id, code, stdin)
+  } catch (err) {
+    outcome = { ok: false, error: toErrorObject(err) }
+  }
+
+  if (py) {
+    postFigures(py, id)
+  }
+
+  self.postMessage({ type: 'done', id, ...outcome })
+
+  currentRunId = null
+  // ส่ง ready เฉพาะเมื่อ Pyodide โหลดได้ มิฉะนั้นจะทับข้อความ error ที่ initPyodide ส่งไปแล้ว
+  if (py) {
     self.postMessage({
       type: 'status',
       state: 'ready',
-      message: 'พร้อมใช้งาน',
+      message: th.runner.readyMessage,
     })
   }
 }

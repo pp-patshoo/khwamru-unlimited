@@ -36,9 +36,17 @@ function appendLine(previous, text) {
  * @param {string} [props.initialCode=''] - โค้ดเริ่มต้น (ใช้กับปุ่มรีเซ็ต)
  * @param {string} [props.initialStdin=''] - ข้อมูล input() เริ่มต้น
  * @param {'python' | 'sql'} [props.language='python']
+ * @param {string[]} [props.packages=[]] - package เพิ่มเติมจาก frontmatter ของบท
+ * @param {string[]} [props.datasets=[]] - ไฟล์ CSV ที่ต้องเตรียมไว้ในโฟลเดอร์ data/
  * @returns {import('react').JSX.Element}
  */
-export function CodePlayground({ initialCode = '', initialStdin = '', language = 'python' }) {
+export function CodePlayground({
+  initialCode = '',
+  initialStdin = '',
+  language = 'python',
+  packages = [],
+  datasets = [],
+}) {
   const [code, setCode] = useState(initialCode)
   const [stdin, setStdin] = useState(initialStdin)
   const [output, setOutput] = useState(EMPTY_OUTPUT)
@@ -46,6 +54,11 @@ export function CodePlayground({ initialCode = '', initialStdin = '', language =
   const [runnerStatus, setRunnerStatus] = useState(getRunnerStatus())
 
   useEffect(() => subscribeRunnerStatus(setRunnerStatus), [])
+
+  // ข้อความความคืบหน้าตอนโหลด package เช่น "กำลังเตรียม pandas..." (ใช้เฉพาะตอนกำลังโหลดหรือรัน)
+  const progressMessage = ['loading', 'running'].includes(runnerStatus.state)
+    ? runnerStatus.message
+    : ''
 
   const handleRun = async () => {
     if (isRunning) return
@@ -57,6 +70,8 @@ export function CodePlayground({ initialCode = '', initialStdin = '', language =
       const res = await runCode({
         code,
         stdin,
+        packages,
+        datasets,
         onStdout: (text) => setOutput((prev) => ({ ...prev, stdout: appendLine(prev.stdout, text) })),
         onStderr: (text) => setOutput((prev) => ({ ...prev, stderr: appendLine(prev.stderr, text) })),
         onResult: (repr) => setOutput((prev) => ({ ...prev, result: repr })),
@@ -122,7 +137,7 @@ export function CodePlayground({ initialCode = '', initialStdin = '', language =
 
       {needsStdin(code) && <StdinBox value={stdin} onChange={setStdin} />}
 
-      <OutputPanel output={output} isRunning={isRunning} />
+      <OutputPanel output={output} isRunning={isRunning} progressMessage={progressMessage} />
     </section>
   )
 }

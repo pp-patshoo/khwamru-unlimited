@@ -40,6 +40,22 @@ const PRESETS = [
     code: 'for i in range(20000):\n    print(i)',
     stdin: '',
   },
+  {
+    key: 'presetCsv',
+    code: 'import pandas as pd\n\npd.read_csv("data/_test.csv").head()',
+    stdin: '',
+    datasets: ['_test.csv'],
+  },
+  {
+    key: 'presetChart',
+    code: 'import matplotlib.pyplot as plt\n\nplt.bar(["กาแฟ", "ชา", "นม"], [120, 80, 45])\nplt.title("ยอดขายตามประเภทสินค้า")\nplt.show()',
+    stdin: '',
+  },
+  {
+    key: 'presetLongTable',
+    code: 'import pandas as pd\n\npd.DataFrame({"ลำดับ": range(1, 101), "กำลังสอง": [n * n for n in range(1, 101)]})',
+    stdin: '',
+  },
 ]
 
 /**
@@ -82,6 +98,7 @@ export function DevRunnerPage() {
         key={selected.nonce}
         initialCode={preset.code}
         initialStdin={preset.stdin}
+        datasets={preset.datasets ?? []}
       />
     </div>
   )

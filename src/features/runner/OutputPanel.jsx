@@ -14,9 +14,10 @@ import styles from './OutputPanel.module.css'
  * @param {string[]} props.output.images - รูป PNG เป็น data URL
  * @param {{ columns: string[], rows: any[][], totalRows: number } | null} props.output.table
  * @param {boolean} props.isRunning
+ * @param {string} [props.progressMessage=''] - ข้อความสถานะจาก worker เช่น "กำลังเตรียม pandas..."
  * @returns {import('react').JSX.Element}
  */
-export function OutputPanel({ output, isRunning }) {
+export function OutputPanel({ output, isRunning, progressMessage = '' }) {
   const hasContent =
     output.stdout ||
     output.stderr ||
@@ -29,7 +30,7 @@ export function OutputPanel({ output, isRunning }) {
     <section className={styles.panel} aria-live="polite">
       <h2 className={styles.title}>{th.playground.outputTitle}</h2>
 
-      {isRunning && <p className={styles.running}>{th.playground.runningLabel}</p>}
+      {isRunning && <p className={styles.running}>{progressMessage || th.playground.runningLabel}</p>}
 
       {output.notice && (
         <p className={styles.notice} role="status">
