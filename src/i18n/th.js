@@ -127,8 +127,8 @@ export const th = {
 
   // Dev Runner Page (T1.1)
   devRunner: {
-    title: 'ทดสอบ Pyodide Runner (T1.1)',
-    description: 'หน้านี้ใช้สำหรับทดสอบการทำงานของ Pyodide Web Worker ตามเกณฑ์ผ่านของ T1.1',
+    title: 'ทดสอบ Code Playground (T1.2)',
+    description: 'หน้านี้ใช้สำหรับทดสอบ Editor, Output และปุ่มหยุดตามเกณฑ์ผ่านของ T1.2',
     statusLabel: 'สถานะ Runner:',
     codeLabel: 'โค้ด Python ที่จะรัน:',
     stdinLabel: 'ข้อมูลสำหรับ input() (แต่ละบรรทัดแยกตามรอบที่เรียก):',
@@ -140,6 +140,8 @@ export const th = {
     presetError: '3. ทดสอบ Error และระบุเลขบรรทัด',
     presetLastExpr: '4. ทดสอบ 1 + 1 บรรทัดสุดท้าย',
     presetNamespace: '5. ทดสอบแยก Namespace',
+    presetInfinite: '6. ทดสอบวนลูปไม่หยุด (while True)',
+    presetLongOutput: '7. ทดสอบ output ยาวเกินไป',
     stdoutLabel: 'Standard Output (stdout):',
     stderrLabel: 'Standard Error (stderr):',
     resultLabel: 'ผลลัพธ์บรรทัดสุดท้าย (Result):',
@@ -153,5 +155,36 @@ export const th = {
     failedDone: 'รันไม่สำเร็จ (ok: false)',
     emptyResult: '(ไม่มีผลลัพธ์)',
     emptyError: '(ไม่มีข้อผิดพลาด)',
+  },
+
+  // Code Playground (T1.2)
+  playground: {
+    sectionLabel: 'ช่องเขียนและรันโค้ด',
+    editorLabel: 'ช่องเขียนโค้ด Python (กด Ctrl+Enter เพื่อรัน, Esc เพื่อออกจากช่องนี้)',
+    controlsLabel: 'ปุ่มควบคุมการรัน',
+    runButton: 'รัน',
+    runningButton: 'กำลังรัน...',
+    runShortcut: 'รันโค้ด (Ctrl+Enter)',
+    stopButton: 'หยุด',
+    resetButton: 'รีเซ็ตโค้ด',
+    stdinLabel: 'ข้อมูลสำหรับ input() (แต่ละบรรทัดใช้กับ input() ตามลำดับ):',
+    outputTitle: 'ผลลัพธ์',
+    stdoutLabel: 'Output',
+    stderrLabel: 'ข้อความ stderr',
+    resultLabel: 'ค่าของบรรทัดสุดท้าย',
+    imageAlt: 'กราฟที่ได้จากโค้ด',
+    tableCaption: (shown, total) => `แสดง ${shown} แถว จากทั้งหมด ${total} แถว`,
+    errorLabel: 'ข้อผิดพลาด',
+    errorType: 'ประเภท:',
+    errorLine: 'บรรทัดที่:',
+    errorMessage: 'ข้อความ:',
+    tracebackLabel: 'รายละเอียด (Traceback):',
+    runningLabel: 'กำลังรันโค้ด...',
+    emptyOutput: 'กดปุ่ม "รัน" เพื่อดูผลลัพธ์',
+    timeoutStopped:
+      'โค้ดทำงานเกิน 10 วินาที ระบบหยุดให้อัตโนมัติ โค้ดอาจวนลูปไม่รู้จบ (เช่น while True ที่ไม่มีเงื่อนไขหยุด) กรุณาตรวจเงื่อนไขของลูปแล้วลองรันใหม่',
+    userStopped: 'หยุดการทำงานแล้ว กดรันอีกครั้งเมื่อพร้อม',
+    outputTruncated:
+      'ผลลัพธ์ยาวเกินไป ระบบตัดส่วนที่เกินออกแล้ว (จำกัดไว้ที่ 10,000 บรรทัด หรือ 1 MB) ลองลดจำนวนครั้งที่ print',
   },
 }

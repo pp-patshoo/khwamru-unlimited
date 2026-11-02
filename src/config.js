@@ -11,6 +11,10 @@ export const config = {
   pyodideIndexUrl: PYODIDE_INDEX_URL,
   pyodideMjsUrl: PYODIDE_MJS_URL,
   pyodideJsUrl: PYODIDE_JS_URL,
+  // ขีดจำกัดการรันโค้ด (SPEC หัวข้อ 6)
+  runTimeoutMs: 10_000, // หยุดโค้ดอัตโนมัติหลัง 10 วินาที (ไม่นับเวลาโหลด)
+  outputMaxLines: 10_000,
+  outputMaxBytes: 1_000_000, // 1 MB
   feedbackUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSc_feedback_placeholder/viewform',
 }
 

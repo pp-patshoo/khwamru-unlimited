@@ -1,6 +1,8 @@
 /**
  * Client for interacting with the Pyodide Web Worker.
  */
+import { config } from '../../config.js'
+import { createOutputLimiter } from './outputLimiter.js'
 
 let worker = null
 let currentStatus = {
@@ -28,6 +30,26 @@ function updateStatus(newStatus) {
 }
 
 /**
+ * จบการรันหนึ่งครั้ง และยกเลิก timer ที่ตั้งไว้
+ * @param {string} id
+ * @param {{ ok: boolean, error?: object | null, stopped?: string | null }} outcome
+ */
+function finishRun(id, outcome) {
+  const run = activeRuns.get(id)
+  if (!run) return
+
+  activeRuns.delete(id)
+  clearTimeout(run.timer)
+  run.resolve({
+    ok: outcome.ok,
+    error: outcome.error || null,
+    result: run.lastResult || null,
+    stopped: outcome.stopped || null,
+    outputTruncated: run.limiter.truncated,
+  })
+}
+
+/**
  * Handle incoming messages from the Pyodide worker
  * @param {MessageEvent} event
  */
@@ -46,7 +68,8 @@ function handleWorkerMessage(event) {
     case 'stdout': {
       const run = activeRuns.get(data.id)
       if (run && typeof run.onStdout === 'function') {
-        run.onStdout(data.text)
+        const text = run.limiter.accept(data.text)
+        if (text !== null) run.onStdout(text)
       }
       break
     }
@@ -54,7 +77,28 @@ function handleWorkerMessage(event) {
     case 'stderr': {
       const run = activeRuns.get(data.id)
       if (run && typeof run.onStderr === 'function') {
-        run.onStderr(data.text)
+        const text = run.limiter.accept(data.text)
+        if (text !== null) run.onStderr(text)
+      }
+      break
+    }
+
+    case 'image': {
+      const run = activeRuns.get(data.id)
+      if (run && typeof run.onImage === 'function') {
+        run.onImage(data.dataUrl)
+      }
+      break
+    }
+
+    case 'table': {
+      const run = activeRuns.get(data.id)
+      if (run && typeof run.onTable === 'function') {
+        run.onTable({
+          columns: data.columns,
+          rows: data.rows,
+          totalRows: data.totalRows,
+        })
       }
       break
     }
@@ -71,15 +115,10 @@ function handleWorkerMessage(event) {
     }
 
     case 'done': {
-      const run = activeRuns.get(data.id)
-      if (run) {
-        activeRuns.delete(data.id)
-        run.resolve({
-          ok: data.ok,
-          error: data.error || null,
-          result: run.lastResult || null,
-        })
-      }
+      finishRun(data.id, {
+        ok: data.ok,
+        error: data.error || null,
+      })
       break
     }
 
@@ -162,23 +201,55 @@ export async function initRunner() {
 }
 
 /**
+ * ทิ้ง worker เดิมทั้งตัว แล้วเริ่ม worker ใหม่ในพื้นหลัง
+ * ต้องทิ้งทั้งตัวเพราะ Pyodide หยุดโค้ดที่วนลูปจากข้างในไม่ได้
+ * การรันครั้งถัดไปจะรอจนกว่า worker ใหม่โหลดเสร็จ
+ * @param {'timeout' | 'user'} reason - สาเหตุที่หยุด ส่งกลับให้หน้าจอแสดงข้อความ
+ */
+function restartRunner(reason) {
+  if (worker) {
+    worker.terminate()
+    worker = null
+  }
+  initPromise = null
+  // ตั้งสถานะเป็น uninitialized ก่อน เพื่อให้ initRunner ไม่คืนค่า ready เดิมทันที
+  updateStatus({ state: 'uninitialized', message: '' })
+
+  for (const id of [...activeRuns.keys()]) {
+    finishRun(id, { ok: false, stopped: reason })
+  }
+
+  initRunner().catch(() => {
+    // สถานะ error ถูกส่งไปแล้วใน initRunner
+  })
+}
+
+/**
  * Execute Python code in the Pyodide worker
+ * ต้องรันทีละโค้ด เพราะ worker ทำงานได้ทีละงาน
+ * timer นับหลัง worker พร้อมแล้ว จึงไม่รวมเวลาโหลด Pyodide
  * @param {object} options
  * @param {string} options.code - Python code to run
  * @param {string} [options.stdin] - Input data for input() calls
  * @param {string} [options.mode='python'] - Execution mode ('python' | 'sql')
+ * @param {number} [options.timeoutMs] - หยุดอัตโนมัติหลังกี่มิลลิวินาที (ค่าเริ่มต้นจาก config)
  * @param {(text: string) => void} [options.onStdout] - Stdout callback
  * @param {(text: string) => void} [options.onStderr] - Stderr callback
  * @param {(repr: string) => void} [options.onResult] - Expression result callback
- * @returns {Promise<{ ok: boolean, error: object | null, result: string | null }>}
+ * @param {(dataUrl: string) => void} [options.onImage] - กราฟที่แปลงเป็น PNG แล้ว
+ * @param {(table: object) => void} [options.onTable] - DataFrame ที่แปลงเป็นตารางแล้ว
+ * @returns {Promise<{ ok: boolean, error: object | null, result: string | null, stopped: 'timeout' | 'user' | null, outputTruncated: boolean }>}
  */
 export async function runCode({
   code,
   stdin = '',
   mode = 'python',
+  timeoutMs = config.runTimeoutMs,
   onStdout,
   onStderr,
   onResult,
+  onImage,
+  onTable,
 }) {
   await initRunner()
 
@@ -186,13 +257,19 @@ export async function runCode({
   const id = `run_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
 
   return new Promise((resolve) => {
-    activeRuns.set(id, {
+    const run = {
       resolve,
       onStdout,
       onStderr,
       onResult,
+      onImage,
+      onTable,
       lastResult: null,
-    })
+      limiter: createOutputLimiter(),
+      timer: null,
+    }
+    run.timer = setTimeout(() => restartRunner('timeout'), timeoutMs)
+    activeRuns.set(id, run)
 
     w.postMessage({
       type: 'run',
@@ -202,6 +279,15 @@ export async function runCode({
       stdin,
     })
   })
+}
+
+/**
+ * หยุดโค้ดที่กำลังรันอยู่ (ปุ่ม "หยุด")
+ * ไม่มีผลถ้าไม่มีโค้ดที่กำลังรัน
+ */
+export function stopRun() {
+  if (activeRuns.size === 0) return
+  restartRunner('user')
 }
 
 /**
@@ -233,6 +319,9 @@ export function _resetRunnerForTest() {
     worker.terminate()
     worker = null
   }
+  for (const run of activeRuns.values()) {
+    clearTimeout(run.timer)
+  }
   currentStatus = {
     state: 'uninitialized',
     message: '',
@@ -241,4 +330,3 @@ export function _resetRunnerForTest() {
   activeRuns.clear()
   initPromise = null
 }
-

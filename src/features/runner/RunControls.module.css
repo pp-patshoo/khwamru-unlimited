@@ -1,0 +1,11 @@
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.icon {
+  width: 1rem;
+  height: 1rem;
+}
